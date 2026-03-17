@@ -163,19 +163,7 @@ int main(void)
                 }
 
             }
-            if (jeu_termine) {
-                do
-                {
-                    printf("Voulez-vous rejouer ? (0 pour non, 1 pour oui)");
-                    scanf("%d", &rejouer);
-                } while (rejouer != 0 && rejouer != 1);
-                if (rejouer == 1) {
-                    sfRenderWindow_close(window);
-                }
-                else {
-                    return joueur;
-                }
-            }
+            
 
 
             /* Clear the screen */
@@ -209,6 +197,20 @@ int main(void)
 
             /* Update the window */
             sfRenderWindow_display(window);
+
+            if (jeu_termine) {
+                do
+                {
+                    printf("Voulez-vous rejouer ? (0 pour non, 1 pour oui)");
+                    scanf("%d", &rejouer);
+                } while (rejouer != 0 && rejouer != 1);
+                if (rejouer == 1) {
+                    sfRenderWindow_close(window);
+                }
+                else {
+                    return joueur;
+                }
+            }
         }
 
         /* Cleanup resources */
