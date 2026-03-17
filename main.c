@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include <SFML/Audio.h>
 #include <SFML/Graphics.h>
+#include <SFML/System.h>
 
 int main(void)
 {
@@ -16,175 +18,164 @@ int main(void)
 
     while (rejouer == 1)
     {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
+        // initialisation de la grille
+        for (int i = 0; i < 6; i++)
+            for (int j = 0; j < 7; j++)
                 grille[i][j] = 0;
-            }
-        }
-        joueur = 1;
-        colonne_jouee;
-        hauteur;
-        jeu_termine = 0;
 
+        joueur = 1;
+        jeu_termine = 0;
 
         sfVideoMode mode = { 500, 500, 32 };
         sfRenderWindow* window;
         sfEvent event;
 
-        /* Create the main window */
         window = sfRenderWindow_create(mode, "Puissance 4", sfClose, NULL);
         if (!window)
-        {
             return -1;
-        }
 
         srand((unsigned int)time(NULL));
 
-        /* Start the game loop */
         while (sfRenderWindow_isOpen(window))
         {
-            /* Process events */
             while (sfRenderWindow_pollEvent(window, &event))
             {
-                /* Close window : exit */
                 if (event.type == sfEvtClosed)
-                {
                     sfRenderWindow_close(window);
-                }
 
                 if (event.type == sfEvtMouseButtonPressed && !jeu_termine)
                 {
                     int x = event.mouseButton.x;
+                    colonne_jouee = x / (500 / 7);
 
-                    colonne_jouee = x / (500 / 7); // adapte à ta fenêtre
-
-                    if (colonne_jouee >= 0 && colonne_jouee < 7 &&
-                        grille[0][colonne_jouee] == 0)
+                    if (colonne_jouee >= 0 && colonne_jouee < 7 && grille[0][colonne_jouee] == 0)
                     {
-                        // faire tomber le pion
-                        for (int i = 5; i >= 0; i--)
+                        // trouver la ligne finale
+                        int ligne_finale = 5;
+                        while (ligne_finale >= 0 && grille[ligne_finale][colonne_jouee] != 0)
+                            ligne_finale--;
+
+                        int taille_case = 500 / 7;
+                        float y_pion = 0;       // position verticale actuelle
+                        float vitesse = 10.0f;  // pixels par frame
+
+                        // animation de la chute
+                        while (y_pion < ligne_finale * taille_case)
                         {
-                            if (grille[i][colonne_jouee] == 0)
+                            sfRenderWindow_clear(window, sfBlack);
+
+                            // dessiner tous les pions déjà placés
+                            sfCircleShape* pion = sfCircleShape_create();
+                            sfCircleShape_setRadius(pion, 25);
+
+                            for (int i = 0; i < 6; i++)
                             {
-                                grille[i][colonne_jouee] = joueur;
-                                hauteur = i;
-                                break;
+                                for (int j = 0; j < 7; j++)
+                                {
+                                    sfCircleShape_setPosition(pion, (sfVector2f) { j* taille_case + 10, i* taille_case + 10 });
+                                    if (grille[i][j] == 1)
+                                        sfCircleShape_setFillColor(pion, sfRed);
+                                    else if (grille[i][j] == 2)
+                                        sfCircleShape_setFillColor(pion, sfYellow);
+                                    else
+                                        sfCircleShape_setFillColor(pion, sfWhite);
+
+                                    sfRenderWindow_drawCircleShape(window, pion, NULL);
+                                }
                             }
+
+                            // dessiner le pion qui tombe
+                            sfCircleShape_setPosition(pion, (sfVector2f) { colonne_jouee* taille_case + 10, y_pion });
+                            sfCircleShape_setFillColor(pion, (joueur == 1) ? sfRed : sfYellow);
+                            sfRenderWindow_drawCircleShape(window, pion, NULL);
+                            sfCircleShape_destroy(pion);
+
+                            sfRenderWindow_display(window);
+                            y_pion += vitesse;
+                            sfSleep(sfMilliseconds(20)); // petite pause pour l'animation
                         }
 
+                        // une fois en bas, mettre à jour la grille
+                        grille[ligne_finale][colonne_jouee] = joueur;
+                        hauteur = ligne_finale;
 
+                        // Vérifications victoire
 
-                        // vérifications victoire
-                        //horizontal
                         int suite = 1;
 
+                        // horizontal
                         for (int i = 1; i < 4; i++) {
-                            if (colonne_jouee + i < 7 &&
-                                grille[hauteur][colonne_jouee + i] == joueur)
+                            if (colonne_jouee + i < 7 && grille[hauteur][colonne_jouee + i] == joueur)
                                 suite++;
                             else break;
                         }
-
                         for (int i = 1; i < 4; i++) {
-                            if (colonne_jouee - i >= 0 &&
-                                grille[hauteur][colonne_jouee - i] == joueur)
+                            if (colonne_jouee - i >= 0 && grille[hauteur][colonne_jouee - i] == joueur)
                                 suite++;
                             else break;
                         }
-
-                        if (suite >= 4) {
-                            printf("Le Joueur %d gagne\n", joueur);
-                            jeu_termine = 1;
-                        }
-
-                        suite = 1;
+                        if (suite >= 4) jeu_termine = 1;
 
                         // vertical
-                        for (int i = 1; i < 4; i++) {
-                            if (hauteur + i < 6 &&
-                                grille[hauteur + i][colonne_jouee] == joueur)
-                                suite++;
-                            else break;
-                        }
-
-                        if (suite >= 4) {
-                            printf("Le Joueur %d gagne\n", joueur);
-                            jeu_termine = 1;
-                        }
-
                         suite = 1;
-
-                        // diagonale 1
                         for (int i = 1; i < 4; i++) {
-                            if (hauteur + i < 6 && colonne_jouee + i < 7 &&
-                                grille[hauteur + i][colonne_jouee + i] == joueur)
+                            if (hauteur + i < 6 && grille[hauteur + i][colonne_jouee] == joueur)
                                 suite++;
                             else break;
                         }
+                        if (suite >= 4) jeu_termine = 1;
 
-                        for (int i = 1; i < 4; i++) {
-                            if (hauteur - i >= 0 && colonne_jouee - i >= 0 &&
-                                grille[hauteur - i][colonne_jouee - i] == joueur)
-                                suite++;
-                            else break;
-                        }
-
-                        if (suite >= 4) {
-                            printf("Le Joueur %d gagne\n", joueur);
-                            jeu_termine = 1;
-                        }
-
+                        // diagonale \
                         suite = 1;
-
-                        // diagonale 2
                         for (int i = 1; i < 4; i++) {
-                            if (hauteur - i >= 0 && colonne_jouee + i < 7 &&
-                                grille[hauteur - i][colonne_jouee + i] == joueur)
+                            if (hauteur + i < 6 && colonne_jouee + i < 7 && grille[hauteur + i][colonne_jouee + i] == joueur)
                                 suite++;
                             else break;
                         }
-
                         for (int i = 1; i < 4; i++) {
-                            if (hauteur + i < 6 && colonne_jouee - i >= 0 &&
-                                grille[hauteur + i][colonne_jouee - i] == joueur)
+                            if (hauteur - i >= 0 && colonne_jouee - i >= 0 && grille[hauteur - i][colonne_jouee - i] == joueur)
                                 suite++;
                             else break;
                         }
+                        if (suite >= 4) jeu_termine = 1;
 
-                        if (suite >= 4) {
-                            printf("Le Joueur %d gagne\n", joueur);
-                            jeu_termine = 1;
+                        // diagonale /
+                        suite = 1;
+                        for (int i = 1; i < 4; i++) {
+                            if (hauteur - i >= 0 && colonne_jouee + i < 7 && grille[hauteur - i][colonne_jouee + i] == joueur)
+                                suite++;
+                            else break;
                         }
+                        for (int i = 1; i < 4; i++) {
+                            if (hauteur + i < 6 && colonne_jouee - i >= 0 && grille[hauteur + i][colonne_jouee - i] == joueur)
+                                suite++;
+                            else break;
+                        }
+                        if (suite >= 4) jeu_termine = 1;
+
+                        system("cls");
+                        if (jeu_termine)
+                            printf("Le Joueur %d gagne !\n", joueur);
 
                         // changement de joueur
-                        if (!jeu_termine)
+                        if (!jeu_termine) {
                             joueur = (joueur == 1) ? 2 : 1;
-                        system("cls");
                             printf("C'est le tour du joueur %d\n", joueur);
+                        }
                     }
                 }
-
             }
-            
 
-
-            /* Clear the screen */
+            // affichage régulier des pions
             sfRenderWindow_clear(window, sfBlack);
-
             sfCircleShape* pion = sfCircleShape_create();
             sfCircleShape_setRadius(pion, 25);
-
             int taille_case = 500 / 7;
-
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    sfCircleShape_setPosition(pion, (sfVector2f) {
-                        j* taille_case + 10,
-                            i* taille_case + 10
-                    });
-
+                    sfCircleShape_setPosition(pion, (sfVector2f) { j* taille_case + 10, i* taille_case + 10 });
                     if (grille[i][j] == 1)
                         sfCircleShape_setFillColor(pion, sfRed);
                     else if (grille[i][j] == 2)
@@ -195,29 +186,26 @@ int main(void)
                     sfRenderWindow_drawCircleShape(window, pion, NULL);
                 }
             }
-
-
-            /* Update the window */
+            sfCircleShape_destroy(pion);
             sfRenderWindow_display(window);
 
-            if (jeu_termine) {
+            if (jeu_termine)
+            {
                 do
                 {
-                    printf("Voulez-vous rejouer ? (0 pour non, 1 pour oui)");
+                    printf("Voulez-vous rejouer ? (0 pour non, 1 pour oui) ");
                     scanf("%d", &rejouer);
                 } while (rejouer != 0 && rejouer != 1);
-                if (rejouer == 1) {
+
+                if (rejouer == 1)
                     sfRenderWindow_close(window);
-                }
-                else {
-                    return joueur;
-                }
+                else
+                    return 0;
             }
         }
 
-        /* Cleanup resources */
         sfRenderWindow_destroy(window);
     }
 
-
+    return 0;
 }
