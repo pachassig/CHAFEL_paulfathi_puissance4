@@ -159,6 +159,8 @@ int main(void)
                         // changement de joueur
                         if (!jeu_termine)
                             joueur = (joueur == 1) ? 2 : 1;
+                        system("cls");
+                            printf("C'est le tour du joueur %d\n", joueur);
                     }
                 }
 
