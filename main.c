@@ -95,7 +95,7 @@ int main(void)
 
         
 
-        for (int i = 6; i >= 0; i--) {
+        for (int i = 5; i >= 0; i--) {
             if (grille[i][colonne_jouee - 1] == 0) {
                 grille[i][colonne_jouee - 1] = joueur;
                 hauteur = i; // grille[hauteur][colonne_jouee] est la pièce que je viens de poser
@@ -107,20 +107,22 @@ int main(void)
         //vérification victoire
         //vérif horizontal
         int suite = 1;
+        // droite
         for (int i = 1; i < 4; i++) {
-            if (colonne_jouee + i < 7 && (grille[hauteur][colonne_jouee + i - 1] == joueur)) {
-                if (grille[hauteur][colonne_jouee + i] == joueur) {
-                    suite += 1;
-                }
+            if (colonne_jouee - 1 + i < 7 &&
+                grille[hauteur][colonne_jouee - 1 + i] == joueur) {
+                suite++;
             }
-            if (colonne_jouee - i >= 0 && (grille[hauteur][colonne_jouee - i + 1] == joueur)) {
-                if (grille[hauteur][colonne_jouee - i] == joueur) {
-                    suite += 1;
-                }
+            else break;
+        }
+
+        // gauche
+        for (int i = 1; i < 4; i++) {
+            if (colonne_jouee - 1 - i >= 0 &&
+                grille[hauteur][colonne_jouee - 1 - i] == joueur) {
+                suite++;
             }
-            else {
-                continue;
-            }
+            else break;
         }
 
         if (suite >= 4) {
@@ -136,19 +138,11 @@ int main(void)
         //vérif vertical
         suite = 1;
         for (int i = 1; i < 4; i++) {
-            if (hauteur + i < 6 && (grille[hauteur + i - 1][colonne_jouee] == joueur)) {
-                if (grille[hauteur + i][colonne_jouee] == joueur) {
-                    suite += 1;
-                }
+            if (hauteur + i < 6 &&
+                grille[hauteur + i][colonne_jouee - 1] == joueur) {
+                suite++;
             }
-            if (hauteur - i >= 0 && (grille[hauteur - i + 1][colonne_jouee] == joueur)) {
-                if (grille[hauteur - i][colonne_jouee] == joueur) {
-                    suite += 1;
-                }
-            }
-            else {
-                continue;
-            }
+            else break;
         }
         if (suite >= 4) {
             printf("Le joueur %d a gagne !", joueur);
@@ -157,19 +151,18 @@ int main(void)
         //vérif diagonale 1
         suite = 1;
         for (int i = 1; i < 4; i++) {
-            if (hauteur + i < 6 && colonne_jouee - i >= 0 && (grille[hauteur + i - 1][colonne_jouee - i + 1] == joueur)) {
-                if (grille[hauteur + i][colonne_jouee - i] == joueur) {
-                    suite += 1;
-                }
+            if (hauteur + i < 6 && colonne_jouee - 1 + i < 7 &&
+                grille[hauteur + i][colonne_jouee - 1 + i] == joueur) {
+                suite++;
             }
-            if (hauteur - i >= 0 && colonne_jouee + i < 7 && (grille[hauteur - i + 1][colonne_jouee + i - 1] == joueur)) {
-                if (grille[hauteur - i][colonne_jouee + i] == joueur) {
-                    suite += 1;
-                }
+            else break;
+        }
+        for (int i = 1; i < 4; i++) {
+            if (hauteur - i >= 0 && colonne_jouee - 1 - i >= 0 &&
+                grille[hauteur - i][colonne_jouee - 1 - i] == joueur) {
+                suite++;
             }
-            else {
-                continue;
-            }
+            else break;
         }
         if (suite >= 4) {
             printf("Le joueur %d a gagne !", joueur);
@@ -179,19 +172,19 @@ int main(void)
         //vérif diagonale 2
         suite = 1;
         for (int i = 1; i < 4; i++) {
-            if (hauteur - i >= 0 && colonne_jouee - i >= 0 && (grille[hauteur - i + 1][colonne_jouee - i + 1] == joueur)) {
-                if (grille[hauteur - i][colonne_jouee - i] == joueur) {
-                    suite += 1;
-                }
+            if (hauteur - i >= 0 && colonne_jouee - 1 + i < 7 &&
+                grille[hauteur - i][colonne_jouee - 1 + i] == joueur) {
+                suite++;
             }
-            if (hauteur + i < 6 && colonne_jouee + i < 7 && (grille[hauteur + i + 1][colonne_jouee + i - 1] == joueur)) {
-                if (grille[hauteur + i][colonne_jouee + i] == joueur) {
-                    suite += 1;
-                }
+            else break;
+        }
+
+        for (int i = 1; i < 4; i++) {
+            if (hauteur + i < 6 && colonne_jouee - 1 - i >= 0 &&
+                grille[hauteur + i][colonne_jouee - 1 - i] == joueur) {
+                suite++;
             }
-            else {
-                continue;
-            }
+            else break;
         }
         if (suite >= 4) {
             printf("Le joueur %d a gagne !", joueur);
