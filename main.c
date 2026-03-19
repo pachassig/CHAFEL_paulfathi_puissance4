@@ -25,25 +25,28 @@ int main(void)
         joueur = 1;
         jeu_termine = 0;
 
-        sfVideoMode mode = { 500, 500, 32 };
+        int largeur = 1000;
+        int longueur = 800;
+
+        sfVideoMode mode = { largeur, longueur, 32 };
         sfRenderWindow* window = sfRenderWindow_create(mode, "Puissance 4", sfClose, NULL);
         if (!window)
             return -1;
 
 
-     
-        
-        sfTexture* texture_j1 = sfTexture_createFromFile("j1.png", NULL);
-        sfTexture* texture_j2 = sfTexture_createFromFile("j2.png", NULL);
 
+
+        sfTexture* texture_j1 = sfTexture_createFromFile("j1.png", NULL);
+        sfTexture* texture_j2 = sfTexture_createFromFile("j2.jpg", NULL);
         sfSprite* sprite_j1 = sfSprite_create();
         sfSprite_setTexture(sprite_j1, texture_j1, sfTrue);
-		sfSprite_scale(sprite_j1, (sfVector2f) { 0.5f, 0.5f });
+        sfSprite_scale(sprite_j1, (sfVector2f) { 0.54f, 0.54f });
         sfSprite_setPosition(sprite_j1, (sfVector2f) { -35, 0 });
         sfSprite* sprite_j2 = sfSprite_create();
         sfSprite_setTexture(sprite_j2, texture_j2, sfTrue);
-        sfSprite_scale(sprite_j2, (sfVector2f) { 0.5f, 0.5f });
-		sfSprite_setPosition(sprite_j1, (sfVector2f) { -35, 0 });
+        sfSprite_scale(sprite_j2, (sfVector2f) { 0.54f, 0.54f });
+        sfSprite_setPosition(sprite_j2, (sfVector2f) { -35, 0 });
+
         while (sfRenderWindow_isOpen(window))
         {
             sfEvent event;
@@ -56,7 +59,7 @@ int main(void)
                 if (event.type == sfEvtMouseButtonPressed && !jeu_termine)
                 {
                     int x = event.mouseButton.x;
-                    colonne_jouee = x / (500 / 7);
+                    colonne_jouee = x / (largeur / 7);
 
                     if (colonne_jouee >= 0 && colonne_jouee < 7 && grille[0][colonne_jouee] == 0)
                     {
@@ -64,7 +67,7 @@ int main(void)
                         while (ligne_finale >= 0 && grille[ligne_finale][colonne_jouee] != 0)
                             ligne_finale--;
 
-                        int taille_case = 500 / 7;
+                        int taille_case = largeur / 7;
                         float y_pion = 0;
                         float vitesse = 10.0f;
 
@@ -148,7 +151,7 @@ int main(void)
             {
                 sfCircleShape* pion = sfCircleShape_create();
                 sfCircleShape_setRadius(pion, 25);
-                int taille_case = 500 / 7;
+                int taille_case = largeur / 7;
 
                 for (int i = 0; i < 6; i++)
                 {
