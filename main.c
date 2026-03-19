@@ -69,7 +69,7 @@ int main(void)
 
                         int taille_case = largeur / 7;
                         float y_pion = 0;
-                        float vitesse = 10.0f;
+                        float vitesse = 25.0f;
 
                         while (y_pion < ligne_finale * taille_case)
                         {
