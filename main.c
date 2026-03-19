@@ -26,25 +26,25 @@ int main(void)
         jeu_termine = 0;
 
         int largeur = 1000;
-        int longueur = 800;
+        int longueur = 850;
 
         sfVideoMode mode = { largeur, longueur, 32 };
         sfRenderWindow* window = sfRenderWindow_create(mode, "Puissance 4", sfClose, NULL);
         if (!window)
             return -1;
 
-
+        
 
 
         sfTexture* texture_j1 = sfTexture_createFromFile("j1.png", NULL);
         sfTexture* texture_j2 = sfTexture_createFromFile("j2.jpg", NULL);
         sfSprite* sprite_j1 = sfSprite_create();
         sfSprite_setTexture(sprite_j1, texture_j1, sfTrue);
-        sfSprite_scale(sprite_j1, (sfVector2f) { 0.54f, 0.54f });
+        sfSprite_scale(sprite_j1, (sfVector2f) { 0.55f, 0.8f });
         sfSprite_setPosition(sprite_j1, (sfVector2f) { -35, 0 });
         sfSprite* sprite_j2 = sfSprite_create();
         sfSprite_setTexture(sprite_j2, texture_j2, sfTrue);
-        sfSprite_scale(sprite_j2, (sfVector2f) { 0.54f, 0.54f });
+        sfSprite_scale(sprite_j2, (sfVector2f) { 0.55f, 0.8f });
         sfSprite_setPosition(sprite_j2, (sfVector2f) { -35, 0 });
 
         while (sfRenderWindow_isOpen(window))
@@ -76,7 +76,7 @@ int main(void)
                             sfRenderWindow_clear(window, sfBlack);
 
                             sfCircleShape* pion = sfCircleShape_create();
-                            sfCircleShape_setRadius(pion, 25);
+                            sfCircleShape_setRadius(pion, 50);
 
                             for (int i = 0; i < 6; i++)
                             {
@@ -150,7 +150,7 @@ int main(void)
             if (!jeu_termine)
             {
                 sfCircleShape* pion = sfCircleShape_create();
-                sfCircleShape_setRadius(pion, 25);
+                sfCircleShape_setRadius(pion, 50);
                 int taille_case = largeur / 7;
 
                 for (int i = 0; i < 6; i++)
@@ -175,9 +175,15 @@ int main(void)
             {
                 // 🎉 Affichage écran victoire
                 if (joueur == 1)
+                {
+                    sfRenderWindow_setSize(window, (sfVector2u) { 1000, 600 });
                     sfRenderWindow_drawSprite(window, sprite_j1, NULL);
+                }
                 else
+                {
+                    sfRenderWindow_setSize(window, (sfVector2u) { 1000, 600 });
                     sfRenderWindow_drawSprite(window, sprite_j2, NULL);
+                }
             }
 
             sfRenderWindow_display(window);
